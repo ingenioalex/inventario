@@ -1,9 +1,20 @@
+# Python — no subir cache ni entorno virtual
 __pycache__/
 *.py[cod]
 .venv/
 venv/
+
+# Base de datos local (en nube usa Neon)
 inventario.db
-exportaciones/
-*.txt
+
+# TXT generados al cerrar pallet (la carpeta sí va con .gitkeep)
+exportaciones/*
+!exportaciones/.gitkeep
+
+# Certificados HTTPS locales
 certs/*.pem
 !certs/.gitkeep
+
+# Archivos temporales
+*.zip
+*.db-journal
