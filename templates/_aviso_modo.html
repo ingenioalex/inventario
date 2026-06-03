@@ -1,0 +1,15 @@
+{% if es_render and url_render %}
+<div class="aviso-modo aviso-nube">
+  <strong>Modo nube (Render)</strong> — Celular con Wi-Fi o datos: <a href="{{ url_render }}">{{ url_render }}</a>
+</div>
+{% elif not es_https and es_wifi_local and url_wifi_celular %}
+<div class="aviso-modo aviso-wifi">
+  <strong>Modo Wi-Fi</strong> — Para camara en el celular abra:
+  <a href="{{ url_wifi_celular }}">{{ url_wifi_celular }}</a>
+  <span class="aviso-modo-chico">(misma red; ejecute <code>./iniciar_wifi.sh</code> en la PC)</span>
+</div>
+{% elif es_https and es_wifi_local and url_wifi_celular %}
+<div class="aviso-modo aviso-wifi ok">
+  <strong>Wi-Fi listo</strong> — Celular: <a href="{{ url_wifi_celular }}">{{ url_wifi_celular }}</a>
+</div>
+{% endif %}

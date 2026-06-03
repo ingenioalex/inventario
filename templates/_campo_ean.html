@@ -1,0 +1,20 @@
+{# ean_id, ean_name (default ean), ean_value (optional), ean_required (default true), ean_autofocus (optional) #}
+<div class="ean-campo" data-ean-wrapper>
+  <label for="{{ ean_id }}">Codigo EAN / barras</label>
+  <div class="ean-fila">
+    <input type="text"
+           id="{{ ean_id }}"
+           name="{{ ean_name|default('ean') }}"
+           class="ean-input"
+           {% if ean_value is defined %}value="{{ ean_value }}"{% endif %}
+           {% if ean_required|default(true) %}required{% endif %}
+           inputmode="numeric"
+           autocomplete="off"
+           placeholder="Escanee o escriba"
+           {% if ean_autofocus %}autofocus{% endif %}>
+    <button type="button" class="btn-camara" data-escanear aria-label="Escanear codigo con camara" title="Escanear">
+      <span class="btn-camara-icono" aria-hidden="true">📷</span>
+    </button>
+  </div>
+  <p class="ean-ayuda" data-ean-ayuda hidden>Toque el icono <strong>📷</strong> para usar la camara del celular</p>
+</div>

@@ -1,0 +1,40 @@
+{% if registros %}
+<section class="lista-registros">
+  <h2 class="lista-titulo">Lineas guardadas ({{ registros|length }})</h2>
+  <p class="lista-ayuda">Toque una linea para editarla o eliminarla</p>
+  {% for r in registros %}
+  <details class="linea-card">
+    <summary class="linea-resumen">
+      <span class="linea-indice">#{{ loop.index }}</span>
+      <span class="linea-datos">
+        <span class="linea-ean">{{ r.ean }}</span>
+        <span class="linea-meta">Cant: <strong>{{ r.cantidad }}</strong> · Caja: <strong>{{ r.numero_caja }}</strong></span>
+      </span>
+    </summary>
+    <div class="linea-detalle">
+      <form method="post" action="{{ url_for('actualizar_registro', registro_id=r.id) }}">
+        {% with ean_id='ean-' ~ r.id, ean_value=r.ean, ean_autofocus=false %}
+        {% include '_campo_ean.html' %}
+        {% endwith %}
+
+        <div class="fila">
+          <div>
+            <label>Cantidad</label>
+            <input type="number" name="cantidad" value="{{ r.cantidad }}" min="1" required inputmode="numeric">
+          </div>
+          <div>
+            <label>N. caja</label>
+            <input type="text" name="numero_caja" value="{{ r.numero_caja }}" required>
+          </div>
+        </div>
+        <button type="submit" class="btn-primario">Guardar cambios</button>
+      </form>
+      <form method="post" action="{{ url_for('eliminar_registro', registro_id=r.id) }}"
+            onsubmit="return confirm('Eliminar esta linea?');">
+        <button type="submit" class="btn-peligro">Eliminar</button>
+      </form>
+    </div>
+  </details>
+  {% endfor %}
+</section>
+{% endif %}

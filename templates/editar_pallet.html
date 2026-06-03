@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block titulo %}Editar pallet {{ pallet_display }}{% endblock %}
+{% block subtitulo %}{{ zona.jerarquia }} — {{ zona.ubicacion }}{% endblock %}
+
+{% block contenido %}
+<nav class="nav-sesion" style="margin-bottom:1rem">
+  <a href="{{ url_for('mapa') }}">Planograma</a>
+  <a href="{{ url_for('inventario') }}">Captura</a>
+</nav>
+
+<div class="zona-info-pallet">
+  Pallet <strong>{{ pallet_display }}</strong> —
+  {{ zona.jerarquia }} / {{ zona.ubicacion }} —
+  <strong>{{ registros|length }}</strong> linea(s)
+</div>
+
+{% if registros %}
+<ul class="editar-lista">
+  {% for r in registros %}
+  <li class="editar-item">
+    <form method="post" action="{{ url_for('actualizar_registro', registro_id=r.id) }}">
+      <label>EAN / Codigo</label>
+      <input type="text" name="ean" value="{{ r.ean }}" required>
+
+      <div class="fila">
+        <div>
+          <label>Cantidad</label>
+          <input type="number" name="cantidad" value="{{ r.cantidad }}" min="1" required>
+        </div>
+        <div>
+          <label>N. caja</label>
+          <input type="text" name="numero_caja" value="{{ r.numero_caja }}" required>
+        </div>
+      </div>
+      <div class="fila-botones">
+        <button type="submit" class="btn-primario btn-mini">Guardar</button>
+      </div>
+    </form>
+    <form method="post" action="{{ url_for('eliminar_registro', registro_id=r.id) }}"
+          style="margin-top:0.35rem"
+          onsubmit="return confirm('Eliminar esta linea?');">
+      <button type="submit" class="btn-peligro btn-mini">Eliminar linea</button>
+    </form>
+    <p style="font-size:0.75rem;color:var(--suave);margin:0.5rem 0 0">
+      {{ r.fecha }} — {{ r.usuario }}
+    </p>
+  </li>
+  {% endfor %}
+</ul>
+{% else %}
+<p>No hay registros en este pallet.</p>
+{% endif %}
+
+<section class="tarjeta" style="margin-top:1rem">
+  <h2>Agregar linea</h2>
+  <form method="post" action="{{ url_for('agregar_registro') }}">
+    <input type="hidden" name="desde_mapa" value="1">
+    <label for="ean">EAN / Codigo de barras</label>
+    <input type="text" id="ean" name="ean" required autocomplete="off">
+
+    <div class="fila">
+      <div>
+        <label for="cantidad">Cantidad</label>
+        <input type="number" id="cantidad" name="cantidad" value="1" min="1" required>
+      </div>
+      <div>
+        <label for="numero_caja">Numero de caja</label>
+        <input type="text" id="numero_caja" name="numero_caja" required>
+      </div>
+    </div>
+    <button type="submit" class="btn-primario">Agregar</button>
+  </form>
+</section>
+
+<form method="post" action="{{ url_for('cerrar_pallet') }}"
+      onsubmit="return confirm('Cerrar pallet y generar TXT?');">
+  <button type="submit" class="btn-cerrar">Cerrar pallet y generar TXT</button>
+</form>
+
+<a href="{{ url_for('mapa') }}" class="btn btn-secundario" style="display:block;text-align:center;margin-top:0.5rem">
+  Volver al planograma
+</a>
+{% endblock %}

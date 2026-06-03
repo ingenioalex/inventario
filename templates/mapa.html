@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+{% from "_celda_pallet.html" import celda %}
+{% block titulo %}Planograma{% endblock %}
+{% block subtitulo %}Mapa HB 318{% endblock %}
+{% block contenedor_class %}contenedor contenedor-mapa-pagina{% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='mapa.css') }}">
+{% endblock %}
+
+{% block contenido %}
+<div class="mapa-pagina">
+  <div class="chip-sesion mapa-chips">
+    <span class="chip">{{ usuario }}</span>
+    <span class="chip">{{ area }}</span>
+  </div>
+
+  {% include '_aviso_modo.html' %}
+
+  <nav class="nav-sesion nav-mapa">
+    <a href="{{ url_for('mapa') }}" class="activo">Mapa</a>
+    <a href="{{ url_for('inventario') }}">Captura</a>
+    {% if ultimo_txt %}
+    <a href="{{ url_for('descargar_txt') }}">TXT</a>
+    {% endif %}
+  </nav>
+
+  <div class="planograma-wrap">
+    <h2 class="planograma-titulo">PLANOGRAMA INV GENERAL HB 318</h2>
+
+    <!-- BODEGA -->
+    <section class="mapa-seccion">
+      <h3 class="mapa-seccion-titulo">Bodega PGC <span class="mapa-rango">1 – 48</span></h3>
+      <div class="scroll-x-wrap" tabindex="0" aria-label="Bodega, deslice horizontal">
+        <div class="scroll-x-inner bodega-layout">
+          <div class="grilla-col">
+            {% for fila in bodega_izq %}
+            <div class="grilla-fila">
+              {% for n in fila %}{{ celda(n, zonas, estados, pallet_activo) }}{% endfor %}
+            </div>
+            {% endfor %}
+          </div>
+          <div class="bodega-centro">
+            {% for col in bodega_centro %}
+            <div class="grilla-col">
+              {% for n in col %}{{ celda(n, zonas, estados, pallet_activo) }}{% endfor %}
+            </div>
+            {% endfor %}
+          </div>
+          <div class="grilla-col">
+            {% for fila in bodega_der %}
+            <div class="grilla-fila">
+              {% for n in fila %}{{ celda(n, zonas, estados, pallet_activo) }}{% endfor %}
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      <p class="scroll-hint">Deslice horizontal para ver toda la bodega</p>
+    </section>
+
+    <!-- PERECIBLES -->
+    <section class="mapa-seccion mapa-seccion-compacta">
+      <h3 class="mapa-seccion-titulo">Perecibles</h3>
+      <div class="mapa-fila-3">
+        <div class="mini-zona">
+          <span class="mini-zona-lbl">C. Congelados</span>
+          {{ celda(49, zonas, estados, pallet_activo) }}
+        </div>
+        <div class="mini-zona">
+          <span class="mini-zona-lbl">C. FLC</span>
+          {{ celda(50, zonas, estados, pallet_activo) }}
+        </div>
+        <div class="mini-zona mini-zona-wide">
+          <span class="mini-zona-lbl">Tras. Panaderia</span>
+          {{ celda(51, zonas, estados, pallet_activo) }}
+        </div>
+      </div>
+    </section>
+
+    <!-- PLATAFORMA -->
+    <section class="mapa-seccion">
+      <h3 class="mapa-seccion-titulo">Plataforma <span class="mapa-rango">52 – 83</span></h3>
+      <div class="plataforma-grid">
+        <div class="plataforma-bloque">
+          <h4 class="plataforma-sub">Non Food</h4>
+          {% for fila in plataforma_nf %}
+          <div class="grilla-fila">
+            {% for n in fila %}{{ celda(n, zonas, estados, pallet_activo) }}{% endfor %}
+          </div>
+          {% endfor %}
+        </div>
+        <div class="plataforma-bloque">
+          <h4 class="plataforma-sub">PGC J02</h4>
+          {% for fila in plataforma_pgc %}
+          <div class="grilla-fila">
+            {% for n in fila %}{{ celda(n, zonas, estados, pallet_activo) }}{% endfor %}
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+
+    <!-- MERMA / DEVOL -->
+    <section class="mapa-seccion mapa-seccion-compacta">
+      <div class="mapa-fila-2">
+        <div class="mini-zona">
+          <span class="mini-zona-lbl">Zona Merma</span>
+          {{ celda(84, zonas, estados, pallet_activo) }}
+        </div>
+        <div class="mini-zona">
+          <span class="mini-zona-lbl">Zona Devolu.</span>
+          {{ celda(85, zonas, estados, pallet_activo) }}
+        </div>
+      </div>
+    </section>
+
+    <!-- TABLA INFERIOR (cards en movil) -->
+    <section class="mapa-seccion">
+      <h3 class="mapa-seccion-titulo">Plataforma especial <span class="mapa-rango">86 – 93</span></h3>
+      <div class="tabla-cards">
+        {% for fila in tabla_inferior %}
+        <div class="tabla-card">
+          <div class="tabla-card-titulo">{{ fila.titulo }}</div>
+          <div class="tabla-card-celdas">
+            {% for n in fila.nums %}
+            {{ celda(n, zonas, estados, pallet_activo) }}
+            {% endfor %}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+
+    <!-- ADICIONALES -->
+    <section class="mapa-seccion mapa-seccion-adicionales">
+      <h3 class="mapa-seccion-titulo">Adicionales <span class="mapa-rango">94 – 200</span></h3>
+      <div class="adicionales-grid">
+        {% for n in range(94, 201) %}
+        {{ celda(n, zonas, estados, pallet_activo) }}
+        {% endfor %}
+      </div>
+    </section>
+  </div>
+
+  <details class="mapa-leyenda-panel">
+    <summary>Ver colores y ayuda</summary>
+    <div class="leyenda">
+      <span class="leyenda-item"><span class="leyenda-color leyenda-vacio"></span> Vacio</span>
+      <span class="leyenda-item"><span class="leyenda-color" style="background:#c8c8c8"></span> Bodega</span>
+      <span class="leyenda-item"><span class="leyenda-color" style="background:#ffe08a"></span> Perecibles</span>
+      <span class="leyenda-item"><span class="leyenda-color" style="background:#ffb366"></span> Non Food</span>
+      <span class="leyenda-item"><span class="leyenda-color" style="background:#7eb8da"></span> PGC / Merma</span>
+      <span class="leyenda-item"><span class="leyenda-color" style="background:#d4e8f5"></span> Tabla</span>
+      <span class="leyenda-item"><span class="leyenda-color" style="background:#d0d0d0"></span> Adicionales</span>
+    </div>
+    <p class="mapa-ayuda">Toque un numero para capturar. Color = ya tiene lineas.</p>
+  </details>
+
+  <form method="post" action="{{ url_for('salir') }}"
+        onsubmit="return confirm('Salir de la sesion?');">
+    <button type="submit" class="btn-salir">Salir</button>
+  </form>
+</div>
+{% endblock %}

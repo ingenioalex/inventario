@@ -1,0 +1,12 @@
+{% macro celda(numero, zonas, estados, pallet_activo) %}
+{% set codigo = '%03d'|format(numero) %}
+{% set zona = zonas.get(codigo, {}) %}
+{% set count = estados.get(codigo, 0) %}
+{% set lleno = count > 0 %}
+{% set clase = zona.get('color_clase', 'bodega-pgc') %}
+<a href="{{ url_for('accion_pallet', pallet=codigo) }}"
+   class="celda-pallet zona-{{ clase }}{% if lleno %} lleno{% endif %}{% if pallet_activo == codigo %} activo{% endif %}"
+   title="{{ zona.get('jerarquia', '') }} - {{ zona.get('ubicacion', '') }}{% if lleno %} ({{ count }} lineas){% else %} (vacio){% endif %}">
+  {{ numero }}
+</a>
+{% endmacro %}

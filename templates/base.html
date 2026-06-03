@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <title>{% block titulo %}Inventario{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='estilo.css') }}">
+  {% block extra_head %}{% endblock %}
+</head>
+<body
+  data-es-render="{{ '1' if es_render else '0' }}"
+  data-url-wifi="{{ url_wifi_celular or '' }}"
+  data-url-render="{{ url_render or '' }}">
+  <div class="{% block contenedor_class %}contenedor{% endblock %}">
+    <header class="header-app">
+      <h1>Inventario</h1>
+      <p>{% block subtitulo %}{% endblock %}</p>
+    </header>
+
+    {% with mensajes = get_flashed_messages(with_categories=true) %}
+      {% if mensajes %}
+        <div class="alertas">
+          {% for categoria, mensaje in mensajes %}
+            <div class="alerta {{ categoria }}">{{ mensaje }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    {% block contenido %}{% endblock %}
+  </div>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

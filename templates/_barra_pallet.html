@@ -1,0 +1,23 @@
+{% if pallet_actual and total_lineas > 0 %}
+<div class="barra-pallet-fija">
+  <form method="post" action="{{ url_for('generar_txt') }}" class="barra-form">
+    <input type="hidden" name="pallet" value="{{ pallet_actual }}">
+    <button type="submit" class="btn-txt">
+      Generar TXT
+    </button>
+  </form>
+  <form method="post" action="{{ url_for('cerrar_pallet') }}"
+        onsubmit="return confirm('Cerrar pallet {{ pallet_display }}? Podra seguir generando TXT despues.');"
+        class="barra-form">
+    <button type="submit" class="btn-cerrar-pallet">
+      Cerrar pallet
+    </button>
+  </form>
+</div>
+{% elif pallet_actual %}
+<div class="barra-pallet-fija barra-solo-cerrar">
+  <form method="post" action="{{ url_for('cerrar_pallet') }}" class="barra-form barra-form-full">
+    <button type="submit" class="btn-secundario">Salir de este pallet</button>
+  </form>
+</div>
+{% endif %}

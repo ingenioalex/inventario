@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block titulo %}Iniciar{% endblock %}
+{% block subtitulo %}Indique su nombre y area{% endblock %}
+
+{% block contenido %}
+<section class="tarjeta">
+  <h2>Iniciar</h2>
+  <form method="post" action="{{ url_for('iniciar_sesion') }}">
+    <label for="usuario">Su nombre</label>
+    <input type="text" id="usuario" name="usuario" required
+           autocomplete="name" placeholder="Ej: Juan Perez" autofocus>
+
+    <label for="area">Area de trabajo</label>
+    <input type="text" id="area" name="area" required
+           autocomplete="organization" placeholder="Ej: Bodega">
+
+    <button type="submit" class="btn-primario">Entrar</button>
+  </form>
+</section>
+{% endblock %}
