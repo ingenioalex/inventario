@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block titulo %}TXT Pallet {{ arch.pallet|int }}{% endblock %}
+{% block subtitulo %}{{ arch.nombre_archivo }}{% endblock %}
+{% block contenedor_class %}contenedor{% endblock %}
+
+{% block contenido %}
+<nav class="nav-sesion">
+  <a href="{{ url_for('mapa') }}">Mapa</a>
+  <a href="{{ url_for('inventario') }}">Captura</a>
+  <a href="{{ url_for('lista_exportaciones') }}" class="activo">TXT</a>
+</nav>
+
+<section class="tarjeta">
+  <h2>Pallet {{ arch.pallet|int }} — {{ arch.lineas }} lineas</h2>
+  <p style="font-size:0.85rem;color:var(--suave)">{{ arch.fecha }}</p>
+  <pre class="txt-preview">{{ arch.contenido }}</pre>
+</section>
+
+<a href="{{ url_for('descargar_archivo_txt', archivo_id=arch.id) }}" class="btn btn-descargar">Descargar este TXT</a>
+<a href="{{ url_for('lista_exportaciones') }}" class="btn btn-secundario" style="display:block;text-align:center;margin-top:0.5rem">Lista de archivos</a>
+{% endblock %}

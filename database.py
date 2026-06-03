@@ -93,6 +93,16 @@ def _schema_sql():
                 rango_fin INTEGER NOT NULL,
                 color_clase TEXT NOT NULL
             );
+            CREATE TABLE IF NOT EXISTS archivos_txt (
+                id SERIAL PRIMARY KEY,
+                sesion_id INTEGER NOT NULL,
+                pallet VARCHAR(3) NOT NULL,
+                nombre_archivo TEXT NOT NULL,
+                contenido TEXT NOT NULL,
+                lineas INTEGER NOT NULL,
+                fecha TEXT NOT NULL,
+                FOREIGN KEY (sesion_id) REFERENCES sesiones(id)
+            );
         """
     return """
         CREATE TABLE IF NOT EXISTS sesiones (
@@ -131,6 +141,16 @@ def _schema_sql():
             rango_inicio INTEGER NOT NULL,
             rango_fin INTEGER NOT NULL,
             color_clase TEXT NOT NULL
+        );
+        CREATE TABLE IF NOT EXISTS archivos_txt (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            sesion_id INTEGER NOT NULL,
+            pallet TEXT NOT NULL,
+            nombre_archivo TEXT NOT NULL,
+            contenido TEXT NOT NULL,
+            lineas INTEGER NOT NULL,
+            fecha TEXT NOT NULL,
+            FOREIGN KEY (sesion_id) REFERENCES sesiones(id)
         );
     """
 
@@ -354,6 +374,58 @@ def cerrar_sesion(sesion_id: int):
     with get_db() as conn:
         cur = conn.cursor()
         cur.execute(f"UPDATE sesiones SET activa = 0 WHERE id = {ph}", (sesion_id,))
+
+
+def guardar_archivo_txt(
+    sesion_id: int,
+    pallet: str,
+    nombre_archivo: str,
+    contenido: str,
+    lineas: int,
+) -> int:
+    ph = "%s" if USE_POSTGRES else "?"
+    fecha = datetime.now().isoformat(timespec="seconds")
+    with get_db() as conn:
+        cur = conn.cursor()
+        if USE_POSTGRES:
+            cur.execute(
+                f"""INSERT INTO archivos_txt
+                   (sesion_id, pallet, nombre_archivo, contenido, lineas, fecha)
+                   VALUES ({ph}, {ph}, {ph}, {ph}, {ph}, {ph}) RETURNING id""",
+                (sesion_id, pallet, nombre_archivo, contenido, lineas, fecha),
+            )
+        else:
+            cur.execute(
+                f"""INSERT INTO archivos_txt
+                   (sesion_id, pallet, nombre_archivo, contenido, lineas, fecha)
+                   VALUES ({ph}, {ph}, {ph}, {ph}, {ph}, {ph})""",
+                (sesion_id, pallet, nombre_archivo, contenido, lineas, fecha),
+            )
+        return _last_id(cur)
+
+
+def listar_archivos_txt(sesion_id: int):
+    ph = "%s" if USE_POSTGRES else "?"
+    with get_db() as conn:
+        cur = conn.cursor()
+        cur.execute(
+            f"""SELECT id, sesion_id, pallet, nombre_archivo, lineas, fecha
+               FROM archivos_txt WHERE sesion_id = {ph}
+               ORDER BY id DESC""",
+            (sesion_id,),
+        )
+        return cur.fetchall()
+
+
+def obtener_archivo_txt(archivo_id: int, sesion_id: int):
+    ph = "%s" if USE_POSTGRES else "?"
+    with get_db() as conn:
+        cur = conn.cursor()
+        cur.execute(
+            f"SELECT * FROM archivos_txt WHERE id = {ph} AND sesion_id = {ph}",
+            (archivo_id, sesion_id),
+        )
+        return cur.fetchone()
 
 
 def motor_bd():

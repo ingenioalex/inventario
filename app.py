@@ -75,18 +75,11 @@ def armar_archivo_txt(registros, pallet: str, usuario: str, area: str) -> bytes:
         f"Area: {area}",
         f"Fecha exportacion: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
         f"Total lineas: {len(registros)}",
-        "-" * 72,
-        f"{'usuario':<20} {'fecha':<20} {'area':<12} {'pallet':<8} "
-        f"{'ean':<16} {'cant':<6} {'caja':<10}",
-        "-" * 72,
+        "\t",
+        "EAN; CANTIDAD; CAJA",
     ]
     for r in registros:
-        lineas.append(
-            f"{r['usuario']:<20} {r['fecha']:<20} {r['area']:<12} {r['pallet']:<8} "
-            f"{r['ean']:<16} {r['cantidad']:<6} {r['numero_caja']:<10}"
-        )
-    lineas.append("-" * 72)
-    lineas.append("FIN DEL ARCHIVO")
+        lineas.append(f"{r['ean']}; {r['cantidad']}; {r['numero_caja']}")
     return ("\n".join(lineas) + "\n").encode("utf-8")
 
 
@@ -315,12 +308,73 @@ def generar_txt_pallet():
         registros, codigo, session["usuario"], session["area"]
     )
     ruta = guardar_txt_en_disco(contenido, codigo, session["sesion_id"])
+    texto = contenido.decode("utf-8")
+    archivo_id = db.guardar_archivo_txt(
+        session["sesion_id"],
+        codigo,
+        ruta.name,
+        texto,
+        len(registros),
+    )
     session["ultimo_txt"] = ruta.name
     flash(
-        f"TXT listo: {len(registros)} lineas del pallet {int(codigo)}.",
+        f"TXT guardado: pallet {int(codigo)}, {len(registros)} lineas.",
         "ok",
     )
-    return redirect(url_for("inventario"))
+    return redirect(url_for("ver_archivo_txt", archivo_id=archivo_id))
+
+
+@app.route("/exportaciones")
+def lista_exportaciones():
+    redir = requiere_sesion()
+    if redir:
+        return redir
+    archivos = db.listar_archivos_txt(session["sesion_id"])
+    return render_template(
+        "exportaciones.html",
+        archivos=archivos,
+        usuario=session.get("usuario"),
+        area=session.get("area"),
+        ultimo_txt=session.get("ultimo_txt"),
+    )
+
+
+@app.route("/exportaciones/<int:archivo_id>")
+def ver_archivo_txt(archivo_id):
+    redir = requiere_sesion()
+    if redir:
+        return redir
+    arch = db.obtener_archivo_txt(archivo_id, session["sesion_id"])
+    if not arch:
+        flash("Archivo no encontrado.", "error")
+        return redirect(url_for("lista_exportaciones"))
+    return render_template(
+        "exportaciones_ver.html",
+        arch=arch,
+        usuario=session.get("usuario"),
+        area=session.get("area"),
+    )
+
+
+@app.route("/exportaciones/<int:archivo_id>/descargar")
+def descargar_archivo_txt(archivo_id):
+    redir = requiere_sesion()
+    if redir:
+        return redir
+    arch = db.obtener_archivo_txt(archivo_id, session["sesion_id"])
+    if not arch:
+        flash("Archivo no encontrado.", "error")
+        return redirect(url_for("lista_exportaciones"))
+    from io import BytesIO
+
+    data = BytesIO(arch["contenido"].encode("utf-8"))
+    data.seek(0)
+    return send_file(
+        data,
+        as_attachment=True,
+        download_name=arch["nombre_archivo"],
+        mimetype="text/plain; charset=utf-8",
+    )
 
 
 @app.route("/descargar-txt")
@@ -329,19 +383,17 @@ def descargar_txt():
     if redir:
         return redir
     nombre = session.get("ultimo_txt")
-    if not nombre:
-        flash("No hay archivo para descargar.", "error")
-        return redirect(url_for("mapa"))
-    ruta = EXPORTS_DIR / nombre
-    if not ruta.is_file():
-        flash("Archivo no encontrado.", "error")
-        return redirect(url_for("mapa"))
-    return send_file(
-        ruta,
-        as_attachment=True,
-        download_name=nombre,
-        mimetype="text/plain; charset=utf-8",
-    )
+    if nombre:
+        ruta = EXPORTS_DIR / nombre
+        if ruta.is_file():
+            return send_file(
+                ruta,
+                as_attachment=True,
+                download_name=nombre,
+                mimetype="text/plain; charset=utf-8",
+            )
+    flash("Use la lista de archivos TXT exportados.", "ok")
+    return redirect(url_for("lista_exportaciones"))
 
 
 @app.route("/cambiar-pallet", methods=["POST"])

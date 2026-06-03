@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block titulo %}Archivos TXT{% endblock %}
+{% block subtitulo %}Exportaciones de esta sesion{% endblock %}
+
+{% block contenido %}
+<nav class="nav-sesion">
+  <a href="{{ url_for('mapa') }}">Mapa</a>
+  <a href="{{ url_for('inventario') }}">Captura</a>
+  <a href="{{ url_for('lista_exportaciones') }}" class="activo">TXT</a>
+</nav>
+
+<div class="chip-sesion">
+  <span class="chip">{{ usuario }}</span>
+  <span class="chip">{{ area }}</span>
+</div>
+
+<section class="tarjeta">
+  <h2>Archivos generados</h2>
+  <p style="font-size:0.9rem;color:var(--suave);margin-bottom:1rem">
+    Cada vez que pulsa <strong>Generar TXT</strong> en un pallet, aparece aqui.
+    Puede verlo en pantalla o descargarlo al celular o PC.
+  </p>
+
+  {% if archivos %}
+  <ul class="lista-exportaciones">
+    {% for a in archivos %}
+    <li class="item-export">
+      <div class="item-export-info">
+        <strong>Pallet {{ a.pallet|int }}</strong>
+        <span class="item-export-meta">{{ a.lineas }} lineas · {{ a.fecha }}</span>
+        <span class="item-export-nombre">{{ a.nombre_archivo }}</span>
+      </div>
+      <div class="item-export-acciones">
+        <a href="{{ url_for('ver_archivo_txt', archivo_id=a.id) }}" class="btn-mini btn-secundario">Ver</a>
+        <a href="{{ url_for('descargar_archivo_txt', archivo_id=a.id) }}" class="btn-mini btn-descargar">Descargar</a>
+      </div>
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p style="color:var(--suave)">Aun no hay archivos. Cierre un pallet con <strong>Generar TXT</strong> en Captura.</p>
+  {% endif %}
+</section>
+
+<a href="{{ url_for('mapa') }}" class="btn btn-secundario" style="display:block;text-align:center">Volver al mapa</a>
+{% endblock %}

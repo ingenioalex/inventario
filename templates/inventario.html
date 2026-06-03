@@ -10,6 +10,7 @@
 <nav class="nav-sesion">
   <a href="{{ url_for('mapa') }}">Mapa</a>
   <a href="{{ url_for('inventario') }}" class="activo">Captura</a>
+  <a href="{{ url_for('lista_exportaciones') }}">TXT</a>
 </nav>
 
 <div class="chip-sesion">
@@ -19,12 +20,10 @@
 
 {% include '_aviso_modo.html' %}
 
-{% if ultimo_txt %}
-<div class="bloque-descarga">
-  <p>Archivo listo para descargar</p>
-  <a href="{{ url_for('descargar_txt') }}" class="btn btn-descargar">Descargar TXT</a>
+<div class="bloque-descarga" style="margin-bottom:0.75rem">
+  <p>Ver todos los TXT exportados de esta sesion</p>
+  <a href="{{ url_for('lista_exportaciones') }}" class="btn btn-descargar">Mis archivos TXT</a>
 </div>
-{% endif %}
 
 {% if pallet_actual %}
 <div class="resumen-pallet">

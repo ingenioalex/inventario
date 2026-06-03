@@ -1,0 +1,16 @@
+<?php
+/**
+ * Copie este archivo como config.php y complete con datos de Miarroba.
+ * Panel → Bases de datos MySQL
+ */
+define('DB_HOST', 'localhost');
+define('DB_NAME', 'nombre_base_datos');
+define('DB_USER', 'usuario_mysql');
+define('DB_PASS', 'clave_mysql');
+define('DB_CHARSET', 'utf8mb4');
+
+/** Ruta web si la app está en subcarpeta, ej: '/inventarioweb/' o '' si está en la raíz */
+define('BASE_PATH', '/inventarioweb/');
+
+/** Clave para sesiones PHP (cambie por una frase larga) */
+define('APP_SECRET', 'cambie-esta-clave-secreta-inventario-2026');

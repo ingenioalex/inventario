@@ -19,9 +19,7 @@
   <nav class="nav-sesion nav-mapa">
     <a href="{{ url_for('mapa') }}" class="activo">Mapa</a>
     <a href="{{ url_for('inventario') }}">Captura</a>
-    {% if ultimo_txt %}
-    <a href="{{ url_for('descargar_txt') }}">TXT</a>
-    {% endif %}
+    <a href="{{ url_for('lista_exportaciones') }}">TXT</a>
   </nav>
 
   <div class="planograma-wrap">
